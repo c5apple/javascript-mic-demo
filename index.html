@@ -9,15 +9,65 @@
 </head>
 
 <body>
+  <button id="start">START</button>
+  <button id="stop" disabled>STOP</button>
+  <p id="target"></p>
+
   <script>
+    const start = document.getElementById('start');
+    const stop = document.getElementById('stop');
+    const target = document.getElementById('target');
+
     SpeechRecognition = webkitSpeechRecognition || SpeechRecognition;
     const recognition = new SpeechRecognition();
 
+    recognition.lang = 'ja-JP';
+    recognition.interimResults = true;  // 途中で結果を得る
+    recognition.continuous = true;  // 認識を続ける
+
+    // 音声認識結果
+    let finalTranscript = '';
+
+    /**
+     * 音声認識イベント
+     */
     recognition.onresult = (event) => {
-      alert(event.results[0][0].transcript);
+      console.group();
+      console.log(event.results[0][0].transcript);
+      console.log(event.results[0].isFinal);
+      console.groupEnd();
+      let interimTranscript = ''; // 暫定認識結果
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        let transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript + '<br>';
+        } else {
+          interimTranscript = transcript;
+        }
+      }
+      target.innerHTML = finalTranscript + '<i style="color:#ccc;">' + interimTranscript + '</i>';
     }
 
-    recognition.start();
+    /**
+     * スタートボタンクリックイベント
+     */
+    start.onclick = () => {
+      // 録音開始
+      recognition.start();
+
+      start.disabled = true;
+      stop.disabled = false;
+    }
+
+    /**
+     * ストップボタンクリックイベント
+     */
+    stop.onclick = () => {
+      recognition.stop();
+
+      start.disabled = false;
+      stop.disabled = true;
+    }
   </script>
 </body>
 
