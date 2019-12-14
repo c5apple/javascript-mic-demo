@@ -11,11 +11,13 @@
 <body>
   <button id="start">START</button>
   <button id="stop" disabled>STOP</button>
+  <button id="speak" disabled>SPEAK</button>
   <p id="target"></p>
 
   <script>
     const start = document.getElementById('start');
     const stop = document.getElementById('stop');
+    const speak = document.getElementById('speak');
     const target = document.getElementById('target');
 
     SpeechRecognition = webkitSpeechRecognition || SpeechRecognition;
@@ -52,11 +54,15 @@
      * スタートボタンクリックイベント
      */
     start.onclick = () => {
+      // 初期化
+      finalTranscript = '';
+
       // 録音開始
       recognition.start();
 
       start.disabled = true;
       stop.disabled = false;
+      speak.disabled = true;
     }
 
     /**
@@ -67,6 +73,16 @@
 
       start.disabled = false;
       stop.disabled = true;
+      speak.disabled = false;
+    }
+
+    /**
+     * スピークボタンクリックイベント
+     */
+     speak.onclick = () => {
+      const uttr = new SpeechSynthesisUtterance(finalTranscript);
+      // 再生 (発言キューに発言を追加)
+      speechSynthesis.speak(uttr);
     }
   </script>
 </body>
